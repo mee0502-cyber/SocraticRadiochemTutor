@@ -1,0 +1,21 @@
+{
+  "name": "放射化学ソクラテスチューター",
+  "short_name": "SocraticChem",
+  "description": "診療放射線技師国家試験対策のための放射化学特化ソクラテスチューター",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#0d1117",
+  "theme_color": "#1f2937",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
