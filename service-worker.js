@@ -1,4 +1,4 @@
-const CACHE_NAME = 'socratic-chem-v2';
+const CACHE_NAME = 'socratic-chem-v3';
 const ASSETS = [
   'index.html',
   'style.css',
@@ -35,11 +35,28 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-// フェッチ時にキャッシュから応答（無ければネットワーク）
+// フェッチ時にネットワーク優先（オフライン時はキャッシュ）
 self.addEventListener('fetch', (e) => {
+  // APIリクエスト等はキャッシュしない
+  if (e.request.url.includes('googleapis.com')) {
+    return;
+  }
+
   e.respondWith(
-    caches.match(e.request).then((cachedResponse) => {
-      return cachedResponse || fetch(e.request);
-    })
+    fetch(e.request)
+      .then((response) => {
+        // 正常なレスポンスがあればキャッシュに保存して返す
+        if (response && response.status === 200 && response.type === 'basic') {
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(e.request, responseToCache);
+          });
+        }
+        return response;
+      })
+      .catch(() => {
+        // ネットワークエラー（オフライン）時はキャッシュから取得
+        return caches.match(e.request);
+      })
   );
 });
