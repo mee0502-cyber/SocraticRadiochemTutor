@@ -1014,11 +1014,13 @@ function initUI() {
 
     // メッセージ送信
     btnSend.addEventListener("click", handleSendMessage);
-    chatInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            handleSendMessage();
-        }
+    
+    // スマホのキーボード確定時の誤送信を防ぐため、Enterでの送信は無効化し、フォーカス時のスクロール処理を追加
+    chatInput.addEventListener("focus", () => {
+        setTimeout(() => {
+            const container = document.getElementById("chat-messages");
+            if (container) container.scrollTop = container.scrollHeight;
+        }, 300); // キーボード表示時のビューポート収縮を待つ
     });
 
     // チャットクリア

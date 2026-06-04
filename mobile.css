@@ -48,7 +48,7 @@ body {
     color: var(--color-text);
     font-family: var(--font-sans);
     height: 100vh;
-    height: -webkit-fill-available; /* iOS対策 */
+    height: 100dvh; /* 動的ビューポート（キーボード連動） */
     overflow: hidden;
     line-height: 1.5;
 }
@@ -57,7 +57,7 @@ body {
     display: flex;
     flex-direction: column;
     height: 100vh;
-    height: -webkit-fill-available;
+    height: 100dvh; /* 動的ビューポート（キーボード連動） */
     width: 100vw;
     position: relative;
 }
