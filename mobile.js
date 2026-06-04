@@ -1025,9 +1025,7 @@ function initUI() {
 
     // チャットクリア
     btnClearChat.addEventListener("click", () => {
-        if (confirm("チャット履歴をクリアしますか？")) {
-            clearChat();
-        }
+        clearChat();
     });
 
     // 設定フォームへの値反映
@@ -1063,20 +1061,15 @@ function initUI() {
 
     // APIキーの削除
     btnSettingsClearKey.addEventListener("click", () => {
-        if (confirm("保存されているAPIキーを削除しますか？")) {
-            document.getElementById("settings-api-key").value = "";
-            state.apiKey = "";
-            localStorage.removeItem("socratic_api_key");
-            updateStatusIndicator();
-            alert("APIキーを削除しました。デモモードに戻ります。");
-        }
+        document.getElementById("settings-api-key").value = "";
+        state.apiKey = "";
+        localStorage.removeItem("socratic_api_key");
+        updateStatusIndicator();
     });
 
     // システムプロンプトのリセット
     btnResetPrompt.addEventListener("click", () => {
-        if (confirm("システムプロンプトを初期状態に戻しますか？")) {
-            document.getElementById("settings-system-prompt").value = defaultSystemPrompt;
-        }
+        document.getElementById("settings-system-prompt").value = defaultSystemPrompt;
     });
 
     // 検索・フィルタリング
@@ -1191,34 +1184,32 @@ function loadQuestionTemplate(qid) {
     const template = questionTemplates[qid];
     if (!template) return;
     
-    if (confirm(`「${template.title}」の演習を開始しますか？（現在のチャットはクリアされます）`)) {
-        clearChat();
-        
-        // ユーザーの質問表示用
-        appendMessage("user", template.text);
-        
-        // チャットビューへ切り替え
-        switchToChatTab();
+    clearChat();
+    
+    // ユーザーの質問表示用
+    appendMessage("user", template.text);
+    
+    // チャットビューへ切り替え
+    switchToChatTab();
 
-        // API動作かデモ動作かに応じて応答を呼び出す
-        if (state.apiKey) {
+    // API動作かデモ動作かに応じて応答を呼び出す
+    if (state.apiKey) {
+        state.chatHistory.push({ role: "user", parts: [{ text: template.initialPrompt }] });
+        fetchAIResponse();
+    } else {
+        // モックモード初期化
+        state.currentMockQuestionId = qid;
+        state.mockTurnIndex = 0;
+        
+        showTyping(true);
+        state.mockTimeoutId = setTimeout(() => {
+            showTyping(false);
+            state.mockTimeoutId = null;
+            const mockResp = mockConversations[qid] ? mockConversations[qid][0].reply : "デモ用のテキストがありません。";
+            appendMessage("model", mockResp);
             state.chatHistory.push({ role: "user", parts: [{ text: template.initialPrompt }] });
-            fetchAIResponse();
-        } else {
-            // モックモード初期化
-            state.currentMockQuestionId = qid;
-            state.mockTurnIndex = 0;
-            
-            showTyping(true);
-            state.mockTimeoutId = setTimeout(() => {
-                showTyping(false);
-                state.mockTimeoutId = null;
-                const mockResp = mockConversations[qid] ? mockConversations[qid][0].reply : "デモ用のテキストがありません。";
-                appendMessage("model", mockResp);
-                state.chatHistory.push({ role: "user", parts: [{ text: template.initialPrompt }] });
-                state.chatHistory.push({ role: "model", parts: [{ text: mockResp }] });
-            }, 1000);
-        }
+            state.chatHistory.push({ role: "model", parts: [{ text: mockResp }] });
+        }, 1000);
     }
 }
 
