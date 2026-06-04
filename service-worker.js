@@ -1,8 +1,11 @@
-const CACHE_NAME = 'socratic-chem-v1';
+const CACHE_NAME = 'socratic-chem-v2';
 const ASSETS = [
   'index.html',
   'style.css',
   'app.js',
+  'mobile.html',
+  'mobile.css',
+  'mobile.js',
   'manifest.json',
   'icon-192.png',
   'icon-512.png'

@@ -39,6 +39,7 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    touch-action: manipulation;
 }
 
 body {
@@ -694,7 +695,7 @@ aside::-webkit-scrollbar-thumb:hover, .chat-messages::-webkit-scrollbar-thumb:ho
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;
-    z-index: 100;
+    z-index: 2000;
 }
 
 .modal.active {
@@ -1004,7 +1005,7 @@ aside::-webkit-scrollbar-thumb:hover, .chat-messages::-webkit-scrollbar-thumb:ho
         height: 100vh;
         width: 340px;
         max-width: 85vw;
-        z-index: 1000;
+        z-index: 1500;
         transform: translateX(100%);
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         border-left: 1px solid var(--border-color);
@@ -1033,7 +1034,7 @@ aside::-webkit-scrollbar-thumb:hover, .chat-messages::-webkit-scrollbar-thumb:ho
         height: 100vh;
         width: 300px;
         max-width: 80vw;
-        z-index: 1000;
+        z-index: 1500;
         transform: translateX(-100%);
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         border-right: 1px solid var(--border-color);

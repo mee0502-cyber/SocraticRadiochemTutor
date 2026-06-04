@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>放射化学ソクラテスチューター | スマホ版</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Outfit:wght@300;400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="mobile.css">
+    
+    <!-- PWA settings -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon-192.png">
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- Header -->
+        <header class="mobile-header">
+            <div class="header-logo">
+                <span class="logo-icon">🎓</span>
+                <span class="logo-text">SocraticChem SP</span>
+            </div>
+            <div class="header-status">
+                <div class="status-indicator" id="api-status">
+                    <span class="status-dot warning"></span>
+                    <span class="status-text">デモ</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Views (Tab Content) -->
+        <main class="mobile-main">
+            <!-- 1. Practice Tab -->
+            <section class="tab-content" id="view-practice">
+                <div class="view-header">
+                    <h2>📝 国試過去問演習</h2>
+                    <p class="view-desc">解きたい計算パターンを選択すると、チャットに移動してAIチューターとの対話演習が始まります。</p>
+                </div>
+                <div class="template-list" id="mobile-template-list">
+                    <!-- Templates will be generated or static -->
+                </div>
+
+                <div class="view-section-divider"></div>
+
+                <div class="view-header">
+                    <h2>📐 主要公式クイックメモ</h2>
+                </div>
+                <div class="formula-list">
+                    <div class="formula-card">
+                        <div class="formula-math">A = A₀ · e^(-λt)</div>
+                        <div class="formula-name">放射能の減衰</div>
+                        <div class="formula-desc">A: 放射能, A₀: 初期値, λ: 壊変定数</div>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-math">T₁/₂ = ln(2) / λ ≈ 0.693 / λ</div>
+                        <div class="formula-name">物理学的半減期と壊変定数</div>
+                        <div class="formula-desc">半減期Tと壊変定数λは反比例の関係にあります。</div>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-math">1/T_eff = 1/T_p + 1/T_b</div>
+                        <div class="formula-name">有効半減期</div>
+                        <div class="formula-desc">T_eff: 有効半減期, T_p: 物理学的半減期, T_b: 生物学的半減期</div>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-math">A_d(t) ≈ A_p(0) · [λ_d / (λ_d - λ_p)] · ...</div>
+                        <div class="formula-name">過渡平衡 (99Mo - 99mTc)</div>
+                        <div class="formula-desc">親核種の半減期が娘核種よりやや長い場合に成立。</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. Chat Tab (Active by default) -->
+            <section class="tab-content active" id="view-chat">
+                <!-- Chat Messages Container -->
+                <div class="chat-messages" id="chat-messages">
+                    <!-- Welcome Message -->
+                    <div class="message system-msg">
+                        <div class="msg-avatar">🎓</div>
+                        <div class="msg-content">
+                            <h3>放射化学ソクラテスチューターへようこそ！</h3>
+                            <p>私は診療放射線技師国家試験の「放射化学」分野を教えるAIチューターです。</p>
+                            <p>答えを教えるのではなく、段階的な質問やヒントであなた自身が解けるようガイドします。</p>
+                            <div class="quick-tips">
+                                <strong>💡 勉強のコツ:</strong>
+                                <ul>
+                                    <li>「過去問」タブから問題を選んで解き始めてみましょう。</li>
+                                    <li>「核種」タブで半減期などを調べられます。</li>
+                                </ul>
+                            </div>
+                            <div class="api-notice" id="demo-banner">
+                                ⚠️ 現在は<strong>デモ（モック）モード</strong>です。自由に対話するには「設定」タブから <strong>Gemini APIキー</strong> を入力してください。
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Typing Indicator -->
+                <div class="typing-indicator" id="typing-indicator" style="display: none;">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span class="typing-text">思考中...</span>
+                </div>
+
+                <!-- Chat Input Area -->
+                <div class="chat-input-container">
+                    <button class="chat-action-btn" id="btn-clear-chat" title="チャットクリア">🗑️</button>
+                    <textarea class="chat-input" id="chat-input" placeholder="メッセージを入力..." rows="1"></textarea>
+                    <button class="send-btn" id="btn-send" disabled>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </div>
+            </section>
+
+            <!-- 3. Isotope Tab -->
+            <section class="tab-content" id="view-isotopes">
+                <div class="view-header">
+                    <h2>⚛️ 放射性核種データシート</h2>
+                    <p class="view-desc">国家試験によく出る主要核種一覧です。タップすると詳細を表示し、チャット入力欄にデータを挿入できます。</p>
+                    <div class="search-box">
+                        <input type="text" id="isotope-search" placeholder="核種名で検索 (例: Tc-99m, I-131)...">
+                        <select id="decay-filter">
+                            <option value="all">すべての壊変</option>
+                            <option value="beta-">&beta;⁻ 壊変</option>
+                            <option value="beta+">&beta;⁺ 壊変</option>
+                            <option value="EC">EC 壊変</option>
+                            <option value="IT">IT (核異性体転移)</option>
+                            <option value="alpha">&alpha; 壊変</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Isotope Grid List -->
+                <div class="isotope-list" id="isotope-list">
+                    <!-- Populate via JS -->
+                </div>
+            </section>
+
+            <!-- 4. Settings Tab -->
+            <section class="tab-content" id="view-settings">
+                <div class="view-header">
+                    <h2>🛠️ チューター・API設定</h2>
+                </div>
+                <div class="settings-form-container">
+                    <form id="settings-form" onsubmit="event.preventDefault();">
+                        <div class="form-group">
+                            <label for="settings-api-key">
+                                Gemini API キー
+                                <a href="https://aistudio.google.com/" target="_blank" class="help-link">取得はこちら(無料)</a>
+                            </label>
+                            <input type="password" id="settings-api-key" placeholder="APIキーを入力してください" autocomplete="off">
+                            <p class="input-tip">キーはブラウザにのみ安全に保存されます。</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="settings-model">使用するAIモデル</label>
+                            <select id="settings-model">
+                                <option value="gemini-2.5-flash">Gemini 2.5 Flash (推奨)</option>
+                                <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                                <option value="gemini-1.5-pro">Gemini 1.5 Pro (高度)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="settings-personality">指導スタイル</label>
+                            <select id="settings-personality">
+                                <option value="socratic_standard">標準ソクラテス式（ヒントと質問）</option>
+                                <option value="socratic_strict">ヒント最小限（自己学習促進）</option>
+                                <option value="step_by_step">計算ステップ順次検証</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="settings-system-prompt">
+                                システムプロンプト
+                                <span class="reset-prompt-btn" id="btn-reset-prompt">リセット</span>
+                            </label>
+                            <textarea id="settings-system-prompt" rows="5"></textarea>
+                        </div>
+                    </form>
+                    <div class="settings-actions">
+                        <button class="settings-btn danger" id="btn-settings-clear-key">キー消去</button>
+                        <button class="settings-btn primary" id="btn-save-settings">設定を保存</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Tab Bar Navigation (LINE style) -->
+        <nav class="mobile-tab-bar">
+            <button class="tab-btn" data-target="view-practice">
+                <span class="tab-icon">📝</span>
+                <span class="tab-label">過去問</span>
+            </button>
+            <button class="tab-btn active" data-target="view-chat">
+                <span class="tab-icon">💬</span>
+                <span class="tab-label">チャット</span>
+            </button>
+            <button class="tab-btn" data-target="view-isotopes">
+                <span class="tab-icon">⚛️</span>
+                <span class="tab-label">核種</span>
+            </button>
+            <button class="tab-btn" data-target="view-settings">
+                <span class="tab-icon">🛠️</span>
+                <span class="tab-label">設定</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Isotope Detail Modal (Full Screen style for Mobile) -->
+    <div class="modal" id="isotope-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-isotope-title">Isotope Name</h3>
+                <button class="close-btn" id="btn-close-isotope-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="isotope-detail-grid">
+                    <div class="detail-item">
+                        <span class="label">物理学的半減期 (T_p)</span>
+                        <span class="val highlight" id="detail-half-life">--</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">壊変モード</span>
+                        <span class="val" id="detail-decay-mode">--</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">主要放出放射線</span>
+                        <span class="val" id="detail-radiation">--</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">製造方法</span>
+                        <span class="val" id="detail-production">--</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">主な用途</span>
+                        <span class="val" id="detail-usage">--</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">国試対策メモ</span>
+                        <div class="val desc" id="detail-exam-notes">--</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn secondary" id="btn-modal-close-footer">閉じる</button>
+                <button class="modal-btn primary" id="btn-insert-isotope-info">質問に添える</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core Script -->
+    <script src="mobile.js"></script>
+</body>
+</html>

@@ -1713,6 +1713,29 @@ function initUI() {
     
     overlay.addEventListener("click", closeMobileDrawers);
 
+    // 画面幅変更（またはデバイス回転）時のドロワー状態自動クリーンアップ
+    window.addEventListener("resize", () => {
+        if (window.innerWidth > 768) {
+            // 768px超（タブレット・PC）なら左サイドバーのactiveを解除
+            if (sidebarLeft && sidebarLeft.classList.contains("active")) {
+                sidebarLeft.classList.remove("active");
+            }
+            // 右サイドバーは1100px超ならactive解除
+            if (window.innerWidth > 1100) {
+                if (sidebarRight && sidebarRight.classList.contains("active")) {
+                    sidebarRight.classList.remove("active");
+                }
+            }
+            // 不要になったオーバーレイの解除
+            if (overlay && overlay.classList.contains("active")) {
+                // 右サイドバーがまだ有効（768px超1100px以下のタブレット）ならオーバーレイは残す
+                if (window.innerWidth > 1100 || (sidebarRight && !sidebarRight.classList.contains("active"))) {
+                    overlay.classList.remove("active");
+                }
+            }
+        }
+    });
+
     updateStatusIndicator();
 }
 
