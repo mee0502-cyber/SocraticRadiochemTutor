@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>放射化学ソクラテスチューター | 診療放射線技師国家試験対策</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Outfit:wght@300;400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- App Container -->
+    <div class="app-container">
+        <!-- Sidebar Left: Templates & Formulas -->
+        <aside class="sidebar-left">
+            <div class="brand">
+                <div class="brand-logo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M12 2v4M12 18v4M2 12h4M18 12h4"></path>
+                    </svg>
+                </div>
+                <div class="brand-info">
+                    <h1>SocraticChem</h1>
+                    <span class="sub">放射化学特化チューター</span>
+                </div>
+            </div>
+
+            <!-- Templates Section -->
+            <div class="sidebar-section">
+                <h2><span class="icon">📝</span>国試過去問演習</h2>
+                <p class="section-desc">解きたい計算パターンを選択すると、AIがヒントを出しながら解法を誘導します。</p>
+                <div class="template-list">
+                    <button class="template-btn" data-qid="q1">
+                        <span class="tag tag-calc">計算</span>
+                        <span class="txt">放射能の減衰と残存割合</span>
+                    </button>
+                    <button class="template-btn" data-qid="q2">
+                        <span class="tag tag-calc">計算</span>
+                        <span class="txt">99Mo-99mTcの放射平衡</span>
+                    </button>
+                    <button class="template-btn" data-qid="q3">
+                        <span class="tag tag-calc">計算</span>
+                        <span class="txt">半減期と壊変定数の関係</span>
+                    </button>
+                    <button class="template-btn" data-qid="q4">
+                        <span class="tag tag-calc">計算</span>
+                        <span class="txt">放射性医薬品の比放射能</span>
+                    </button>
+                    <button class="template-btn" data-qid="q5">
+                        <span class="tag tag-know">知識</span>
+                        <span class="txt">EC壊変と特性X線・オージェ電子</span>
+                    </button>
+                    <button class="template-btn" data-qid="q6">
+                        <span class="tag tag-know">知識</span>
+                        <span class="txt">放射線測定器の選択と原理</span>
+                    </button>
+                    <button class="template-btn" data-qid="q7">
+                        <span class="tag tag-calc">計算</span>
+                        <span class="txt">分配比と溶媒抽出の計算</span>
+                    </button>
+                    <button class="template-btn" data-qid="q8">
+                        <span class="tag tag-calc">計算</span>
+                        <span class="txt">有効半減期の計算公式</span>
+                    </button>
+                    <button class="template-btn" data-qid="q9">
+                        <span class="tag tag-know">知識</span>
+                        <span class="txt">標識化合物の自己放射線分解と保存</span>
+                    </button>
+                    <button class="template-btn" data-qid="q10">
+                        <span class="tag tag-know">知識</span>
+                        <span class="txt">放射性核種純度と検定方法</span>
+                    </button>
+                    <button class="template-btn" data-qid="q11">
+                        <span class="tag tag-know">知識</span>
+                        <span class="txt">放射化学分離と担体の特徴</span>
+                    </button>
+                    <button class="template-btn" data-qid="q12">
+                        <span class="tag tag-know">知識</span>
+                        <span class="txt">放射性核種の分離法の原理</span>
+                    </button>
+                    <button class="template-btn" data-qid="q13">
+                        <span class="tag tag-know">知識</span>
+                        <span class="txt">99Mo-99mTcジェネレータの溶出液</span>
+                    </button>
+                    <button class="template-btn" data-qid="q14">
+                        <span class="tag tag-know">知識</span>
+                        <span class="txt">標識化合物の純度の定義と特徴</span>
+                    </button>
+                    <button class="template-btn" data-qid="q15">
+                        <span class="tag tag-know">知識</span>
+                        <span class="txt">ホウ素中性子捕捉療法(BNCT)の核反応</span>
+                    </button>
+                    <button class="template-btn" data-qid="q16">
+                        <span class="tag tag-know">知識</span>
+                        <span class="txt">放射性核種の沈殿防止と保持担体</span>
+                    </button>
+                    <button class="template-btn" data-qid="q17">
+                        <span class="tag tag-know">知識</span>
+                        <span class="txt">カラムを必要としないクロマトグラフィ</span>
+                    </button>
+                    <button class="template-btn" data-qid="q18">
+                        <span class="tag tag-know">知識</span>
+                        <span class="txt">荷電粒子線を用いる元素分析(PIXE法)</span>
+                    </button>
+                    <button class="template-btn" data-qid="q19">
+                        <span class="tag tag-know">知識</span>
+                        <span class="txt">ジェネレータの親核種と放射平衡</span>
+                    </button>
+                    <button class="template-btn" data-qid="q20">
+                        <span class="tag tag-know">知識</span>
+                        <span class="txt">14Cおよび各種核種の標識合成法</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Formulas Section -->
+            <div class="sidebar-section">
+                <h2><span class="icon">📐</span>主要公式クイックメモ</h2>
+                <div class="formula-list">
+                    <div class="formula-card">
+                        <div class="formula-math">A = A₀ · e^(-λt)</div>
+                        <div class="formula-name">放射能の減衰</div>
+                        <div class="formula-desc">A: 時刻tでの放射能, A₀: 初期放射能, λ: 壊変定数</div>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-math">T₁/₂ = ln(2) / λ ≈ 0.693 / λ</div>
+                        <div class="formula-name">物理学的半減期と壊変定数</div>
+                        <div class="formula-desc">半減期Tと壊変定数λは反比例の関係にあります。</div>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-math">1/T_eff = 1/T_p + 1/T_b</div>
+                        <div class="formula-name">有効半減期</div>
+                        <div class="formula-desc">T_eff: 有効半減期, T_p: 物理学的半減期, T_b: 生物学的半減期</div>
+                    </div>
+                    <div class="formula-card">
+                        <div class="formula-math">A_d(t) ≈ A_p(0) · [λ_d / (λ_d - λ_p)] · ...</div>
+                        <div class="formula-name">過渡平衡 (99Mo - 99mTc)</div>
+                        <div class="formula-desc">親核種の半減期が娘核種よりやや長い場合に成立。約23時間で極大。</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-area">
+            <!-- Chat Header -->
+            <header class="chat-header">
+                <div class="status-bar">
+                    <div class="status-indicator" id="api-status">
+                        <span class="status-dot warning"></span>
+                        <span class="status-text">デモ（モック）モード動作中</span>
+                    </div>
+                    <div class="university-tag">京都医療科学大学</div>
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn" id="btn-clear-chat" title="チャット履歴をクリア">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"></path>
+                        </svg>
+                    </button>
+                    <button class="icon-btn primary" id="btn-settings" title="設定 (APIキーなど)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"></path>
+                        </svg>
+                        <span>設定</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Chat Messages Container -->
+            <div class="chat-messages" id="chat-messages">
+                <!-- Welcome Message -->
+                <div class="message system-msg">
+                    <div class="msg-avatar">🎓</div>
+                    <div class="msg-content">
+                        <h3>放射化学ソクラテスチューターへようこそ！</h3>
+                        <p>私は診療放射線技師国家試験の「放射化学」分野を教えるAIチューターです。</p>
+                        <p>このアプリでは、あなたにすぐ答えを教えることはしません。段階的な質問やヒントを提示し、あなた自身の力で国家試験レベルの問題が解けるようガイドします。</p>
+                        <div class="quick-tips">
+                            <strong>💡 勉強のコツ:</strong>
+                            <ul>
+                                <li>わからない計算問題は「この問題の解き方を教えて」ではなく、「〜の計算で立式がわかりません」のように伝えると、より適切なヒントが得られます。</li>
+                                <li>右側の「放射性核種データシート」で半減期や壊変モードを調べながら回答してみてください。</li>
+                            </ul>
+                        </div>
+                        <div class="api-notice" id="demo-banner">
+                            ⚠️ 現在は<strong>デモ（モック）モード</strong>で動作しています。実際に自由に会話するためには、右上の「設定」ボタンから <strong>Gemini APIキー</strong> を入力してください。
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Typing Indicator (Hidden by default) -->
+            <div class="typing-indicator" id="typing-indicator" style="display: none;">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span class="typing-text">チューターが思考中...</span>
+            </div>
+
+            <!-- Chat Input Area -->
+            <div class="chat-input-container">
+                <textarea class="chat-input" id="chat-input" placeholder="質問を入力するか、左の国試過去問テンプレートを選択してください..." rows="1"></textarea>
+                <button class="send-btn" id="btn-send" disabled>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+        </main>
+
+        <!-- Sidebar Right: Radionuclide Reference -->
+        <aside class="sidebar-right">
+            <div class="sidebar-right-header">
+                <h2><span class="icon">⚛️</span>放射性核種データシート</h2>
+                <p class="section-desc">技師国試で特に出題される主要な放射性核種の一覧です。クリックで詳細を表示します。</p>
+                <div class="search-box">
+                    <input type="text" id="isotope-search" placeholder="核種名で検索 (例: Tc-99m, I-131)...">
+                    <select id="decay-filter">
+                        <option value="all">すべての壊変</option>
+                        <option value="beta-">&beta;⁻ 壊変</option>
+                        <option value="beta+">&beta;⁺ 壊変</option>
+                        <option value="EC">EC 壊変</option>
+                        <option value="IT">IT (核異性体転移)</option>
+                        <option value="alpha">&alpha; 壊変</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Isotope Grid -->
+            <div class="isotope-list" id="isotope-list">
+                <!-- Javascript will populate this -->
+            </div>
+        </aside>
+    </div>
+
+    <!-- Isotope Detail Modal -->
+    <div class="modal" id="isotope-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-isotope-title">Isotope Name</h3>
+                <button class="close-btn" id="btn-close-isotope-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="isotope-detail-grid">
+                    <div class="detail-item">
+                        <span class="label">物理学的半減期 (T_p)</span>
+                        <span class="val highlight" id="detail-half-life">--</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">壊変モード</span>
+                        <span class="val" id="detail-decay-mode">--</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">主要放出放射線 (エネルギー)</span>
+                        <span class="val" id="detail-radiation">--</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">製造方法</span>
+                        <span class="val" id="detail-production">--</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">主な用途 (国家試験重要項目)</span>
+                        <span class="val" id="detail-usage">--</span>
+                    </div>
+                    <div class="detail-item full-width">
+                        <span class="label">国試対策メモ</span>
+                        <div class="val desc" id="detail-exam-notes">--</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn primary" id="btn-insert-isotope-info">この核種データを質問に添える</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settings-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🛠️ チューター設定 & APIキー設定</h3>
+                <button class="close-btn" id="btn-close-settings-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="settings-form" onsubmit="event.preventDefault();">
+                    <div class="form-group">
+                        <label for="settings-api-key">
+                            Gemini API キー 
+                            <span class="required">*</span>
+                            <a href="https://aistudio.google.com/" target="_blank" class="help-link">APIキーの取得方法はこちら(Google AI Studio)</a>
+                        </label>
+                        <input type="password" id="settings-api-key" placeholder="AI Studioで取得したAPIキーを入力してください" autocomplete="off">
+                        <p class="input-tip">キーは安全のためお客様のブラウザ(localStorage)にのみ保存され、外部のサーバーには送信されません。</p>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="settings-model">使用するAIモデル</label>
+                            <select id="settings-model">
+                                <option value="gemini-2.5-flash">Gemini 2.5 Flash (推奨: 高速・高精度)</option>
+                                <option value="gemini-1.5-flash">Gemini 1.5 Flash (高速)</option>
+                                <option value="gemini-1.5-pro">Gemini 1.5 Pro (より高度な推論)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="settings-personality">チューターの指導スタイル</label>
+                            <select id="settings-personality">
+                                <option value="socratic_standard">標準ソクラテス式（ヒントと質問で誘導）</option>
+                                <option value="socratic_strict">ヒント最小限（式や定義を自分で調べさせる）</option>
+                                <option value="step_by_step">計算ステップ順次検証（途中式を1行ずつ確認）</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="settings-system-prompt">
+                            システムプロンプト (AIへの指示) 
+                            <span class="reset-prompt-btn" id="btn-reset-prompt">デフォルトに戻す</span>
+                        </label>
+                        <textarea id="settings-system-prompt" rows="8"></textarea>
+                        <p class="input-tip">※AIの応答態度を調整するためのプロンプトです。通常はデフォルトのままで問題ありません。</p>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn secondary" id="btn-settings-clear-key">APIキーを消去</button>
+                <div style="flex-grow: 1;"></div>
+                <button class="modal-btn secondary" id="btn-close-settings">キャンセル</button>
+                <button class="modal-btn primary" id="btn-save-settings">設定を保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script -->
+    <script src="app.js"></script>
+</body>
+</html>
