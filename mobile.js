@@ -1047,7 +1047,6 @@ function initUI() {
         localStorage.setItem("socratic_system_prompt", state.systemPrompt);
         
         updateStatusIndicator();
-        alert("設定を保存しました。");
 
         // ウェルカムメッセージ警告表示の更新
         const demoBanner = document.getElementById("demo-banner");

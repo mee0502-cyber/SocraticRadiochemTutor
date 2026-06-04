@@ -1619,20 +1619,17 @@ function initUI() {
 
     // APIキーの削除
     btnSettingsClearKey.addEventListener("click", () => {
-        if (confirm("保存されているAPIキーを削除しますか？")) {
-            document.getElementById("settings-api-key").value = "";
-            state.apiKey = "";
-            localStorage.removeItem("socratic_api_key");
-            updateStatusIndicator();
-            alert("APIキーを削除しました。デモモードに戻ります。");
-        }
+        document.getElementById("settings-api-key").value = "";
+        state.apiKey = "";
+        localStorage.removeItem("socratic_api_key");
+        updateStatusIndicator();
+        appendSystemMessage("⚙️ APIキーを削除しました。デモモードに戻ります。");
+        closeSettings();
     });
 
     // システムプロンプトのリセット
     btnResetPrompt.addEventListener("click", () => {
-        if (confirm("システムプロンプトを初期状態に戻しますか？")) {
-            document.getElementById("settings-system-prompt").value = defaultSystemPrompt;
-        }
+        document.getElementById("settings-system-prompt").value = defaultSystemPrompt;
     });
 
     // 検索・フィルタリング
