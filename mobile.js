@@ -1440,6 +1440,12 @@ async function fetchAIResponse() {
         showTyping(false);
         state.activeAbortController = null;
         console.error("Gemini API Error:", error);
+        
+        // エラー発生時は、同じ role (user) が連続してAPIエラー(400)になるのを防ぐため、直前に追加したuser発言を履歴から削除
+        if (state.chatHistory.length > 0 && state.chatHistory[state.chatHistory.length - 1].role === "user") {
+            state.chatHistory.pop();
+        }
+        
         appendSystemMessage(`❌ エラー: ${error.message}\nAPIキーと接続環境を確認してください。`);
     }
 }
