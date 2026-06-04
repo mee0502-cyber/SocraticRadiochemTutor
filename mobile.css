@@ -60,6 +60,7 @@ body {
     height: 100dvh; /* 動的ビューポート（キーボード連動） */
     width: 100vw;
     position: relative;
+    overflow: hidden;
 }
 
 /* Header Styles */
@@ -129,17 +130,19 @@ body {
     flex-grow: 1;
     position: relative;
     overflow: hidden;
-    margin-bottom: 60px; /* タブバー用の余白 */
 }
 
 /* Tab Content Styles */
 .tab-content {
     display: none; /* デフォルト非表示 */
-    width: 100%;
-    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    padding: 16px;
+    padding: 16px 16px 30px 16px;
     animation: fadeIn 0.2s ease-out;
 }
 
@@ -151,6 +154,11 @@ body {
 #view-chat {
     padding: 0;
     display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     flex-direction: column;
     justify-content: space-between;
 }
@@ -669,10 +677,6 @@ body {
 
 /* Mobile Tab Bar Styles (LINE style) */
 .mobile-tab-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
     height: 60px;
     background-color: rgba(17, 22, 37, 0.96);
     backdrop-filter: blur(15px);
@@ -683,6 +687,7 @@ body {
     align-items: center;
     z-index: 500;
     padding-bottom: env(safe-area-inset-bottom); /* iPhone下部バー対応 */
+    flex-shrink: 0;
 }
 
 .tab-btn {
