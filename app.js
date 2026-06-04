@@ -1664,8 +1664,54 @@ function initUI() {
         chatInput.style.height = (chatInput.scrollHeight - 4) + "px";
         btnSend.disabled = false;
         isotopeModal.classList.remove("active");
+        closeMobileDrawers();
         chatInput.focus();
     });
+
+    // モバイルメニューのトグル処理
+    const btnToggleLeft = document.getElementById("btn-toggle-sidebar-left");
+    const btnToggleRight = document.getElementById("btn-toggle-sidebar-right");
+    const sidebarLeft = document.querySelector(".sidebar-left");
+    const sidebarRight = document.querySelector(".sidebar-right");
+    
+    // オーバーレイ要素の作成と追加
+    let overlay = document.getElementById("drawer-overlay");
+    if (!overlay) {
+        overlay = document.createElement("div");
+        overlay.className = "drawer-overlay";
+        overlay.id = "drawer-overlay";
+        document.body.appendChild(overlay);
+    }
+    
+    const closeDrawers = () => {
+        closeMobileDrawers();
+    };
+    
+    if (btnToggleLeft) {
+        btnToggleLeft.addEventListener("click", () => {
+            sidebarLeft.classList.toggle("active");
+            sidebarRight.classList.remove("active");
+            if (sidebarLeft.classList.contains("active")) {
+                overlay.classList.add("active");
+            } else {
+                overlay.classList.remove("active");
+            }
+        });
+    }
+    
+    if (btnToggleRight) {
+        btnToggleRight.addEventListener("click", () => {
+            sidebarRight.classList.toggle("active");
+            sidebarLeft.classList.remove("active");
+            if (sidebarRight.classList.contains("active")) {
+                overlay.classList.add("active");
+            } else {
+                overlay.classList.remove("active");
+            }
+        });
+    }
+    
+    overlay.addEventListener("click", closeMobileDrawers);
 
     updateStatusIndicator();
 }
@@ -1696,6 +1742,7 @@ function updateStatusIndicator() {
 
 // 過去問テンプレートのロード
 function loadQuestionTemplate(qid) {
+    closeMobileDrawers();
     const template = questionTemplates[qid];
     if (!template) return;
     
@@ -2052,4 +2099,14 @@ function filterIsotopes() {
             card.style.display = "none";
         }
     });
+}
+
+// モバイル表示時のドロワー（サイドバー）クローズ共通関数
+function closeMobileDrawers() {
+    const sidebarLeft = document.querySelector(".sidebar-left");
+    const sidebarRight = document.querySelector(".sidebar-right");
+    const overlay = document.getElementById("drawer-overlay");
+    if (sidebarLeft) sidebarLeft.classList.remove("active");
+    if (sidebarRight) sidebarRight.classList.remove("active");
+    if (overlay) overlay.classList.remove("active");
 }

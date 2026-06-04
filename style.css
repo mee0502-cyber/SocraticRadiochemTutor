@@ -942,21 +942,165 @@ aside::-webkit-scrollbar-thumb:hover, .chat-messages::-webkit-scrollbar-thumb:ho
     50% { transform: scale(0.5); opacity: 0.3; }
 }
 
+/* Mobile Toggle & Drawer UI Elements */
+.mobile-toggle-btn {
+    display: none;
+    background: transparent;
+    border: none;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+    flex-shrink: 0;
+}
+
+.mobile-toggle-btn:hover {
+    color: var(--color-text-light);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.mobile-toggle-btn svg {
+    width: 24px;
+    height: 24px;
+    display: block;
+}
+
+.mobile-data-btn {
+    display: none; /* Desktop default hidden */
+}
+
+/* Background overlay when drawer is open */
+.drawer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 900;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.drawer-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
 /* Responsive breakpoints */
 @media (max-width: 1100px) {
     .app-container {
-        grid-template-columns: 280px 1fr 0px; /* Hide isotope panel or collapses it */
+        grid-template-columns: 300px 1fr; /* Hide right sidebar on desktop grid */
     }
+    
     .sidebar-right {
-        display: none;
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 100vh;
+        width: 340px;
+        max-width: 85vw;
+        z-index: 1000;
+        transform: translateX(100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-left: 1px solid var(--border-color);
+        box-shadow: none;
+    }
+    
+    .sidebar-right.active {
+        transform: translateX(0);
+        box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+    }
+    
+    .mobile-data-btn {
+        display: flex !important; /* Show isotope reference button in header */
     }
 }
 
 @media (max-width: 768px) {
     .app-container {
-        grid-template-columns: 0px 1fr 0px; /* Chat takes full screen */
+        grid-template-columns: 1fr; /* Chat takes full screen */
     }
+    
     .sidebar-left {
-        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 300px;
+        max-width: 80vw;
+        z-index: 1000;
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-right: 1px solid var(--border-color);
+        box-shadow: none;
+    }
+    
+    .sidebar-left.active {
+        transform: translateX(0);
+        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+    }
+    
+    .sidebar-right {
+        width: 300px;
+        max-width: 80vw;
+    }
+    
+    .mobile-toggle-btn {
+        display: block; /* Show hamburger menu button */
+    }
+    
+    .chat-header {
+        padding: 10px 16px;
+    }
+    
+    .status-bar {
+        gap: 8px;
+    }
+    
+    .university-tag {
+        display: none; /* Hide to save horizontal space on small screens */
+    }
+    
+    .chat-messages {
+        padding: 16px;
+        gap: 16px;
+    }
+    
+    .message {
+        max-width: 90%;
+    }
+    
+    .typing-indicator {
+        margin-left: 54px;
+    }
+    
+    .chat-input-container {
+        padding: 12px 16px;
+        gap: 8px;
+    }
+    
+    .chat-input {
+        padding: 10px 14px;
+        font-size: 0.85rem;
+    }
+    
+    .send-btn {
+        width: 40px;
+        height: 40px;
+    }
+    
+    /* Adjust quick links / reference links layout inside modals */
+    .isotope-detail-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .detail-item.full-width {
+        grid-column: span 1;
     }
 }
