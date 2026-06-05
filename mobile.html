@@ -262,5 +262,27 @@
 
     <!-- Core Script -->
     <script src="mobile.js"></script>
+    <!-- PWA Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (!refreshing) {
+            refreshing = true;
+            window.location.reload();
+          }
+        });
+
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('service-worker.js')
+            .then(reg => {
+              console.log('ServiceWorker registered:', reg);
+              // Force check for updates
+              reg.update();
+            })
+            .catch(err => console.log('ServiceWorker registration failed:', err));
+        });
+      }
+    </script>
 </body>
 </html>
