@@ -1847,18 +1847,25 @@ function loadQuestionTemplate(qid) {
             showTyping(true);
             const currentSessionId = state.sessionId;
             state.mockTimeoutId = setTimeout(() => {
-                if (state.sessionId !== currentSessionId) return;
-                
-                showTyping(false);
-                state.mockTimeoutId = null;
-                const mockResp = mockConversations[qid] ? mockConversations[qid][0].reply : "デモ用のテキストがありません。";
-                appendMessage("model", mockResp);
-                state.chatHistory.push({ role: "user", parts: [{ text: template.initialPrompt }] });
-                state.chatHistory.push({ role: "model", parts: [{ text: mockResp }] });
-                
-                if (chatInput) {
-                    chatInput.disabled = false;
-                    chatInput.focus();
+                try {
+                    if (state.sessionId !== currentSessionId) return;
+                    
+                    showTyping(false);
+                    state.mockTimeoutId = null;
+                    const mockResp = (mockConversations[qid] && mockConversations[qid][0]) ? mockConversations[qid][0].reply : "デモ用のテキストがありません。";
+                    appendMessage("model", mockResp);
+                    state.chatHistory.push({ role: "user", parts: [{ text: template.initialPrompt }] });
+                    state.chatHistory.push({ role: "model", parts: [{ text: mockResp }] });
+                } catch (mockErr) {
+                    console.error("Mock load error in app.js:", mockErr);
+                    showTyping(false);
+                    state.mockTimeoutId = null;
+                    appendSystemMessage("❌ デモデータの読み込み中にエラーが発生しました。");
+                } finally {
+                    if (state.sessionId === currentSessionId && chatInput) {
+                        chatInput.disabled = false;
+                        chatInput.focus();
+                    }
                 }
             }, 1000);
         }

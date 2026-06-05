@@ -931,32 +931,7 @@ $$T_{eff} = \\frac{T_p \\cdot T_b}{T_p + T_b}$$
 - 活性なラジカルによる間接分解を防ぐため：**ラジカルスカベンジャを添加する（5番）**
 この2つになります。答えてみてください。`
         }
-    ]
-};
-
-// デフォルトのシステムプロンプト
-const defaultSystemPrompt = `あなたは診療放射線技師国家試験対策の専門チューター「SocraticChem」です。
-担当分野は「放射化学」です。
-指導スタイルは「ソクラテス式問答」です。以下のルールを厳格に守って回答してください：
-1. 学生に直接の「答え」や「式そのもの」を絶対にすぐに教えてはいけません。
-2. 常に、1つの応答で提示するヒントは「1ステップ」または「1つの質問」にとどめてください。
-3. 学生が誤った回答をした場合は、どこが間違っているかを考えさせる誘導の質問をしてください。
-4. 正しい理解に達したときは、その内容をわかりやすく褒め、重要ポイントを簡潔にまとめて記憶に定着させてください。
-5. 日本語で、親しみやすく、かつ熱意をもって指導してください。`;
-
-// 状態管理
-const state = {
-    apiKey: "",
-    model: "gemini-2.5-flash",
-    personality: "socratic_standard",
-    systemPrompt: defaultSystemPrompt,
-    chatHistory: [],
-    currentMockQuestionId: null,
-    mockTurnIndex: 0,
-    mockTimeoutId: null,
-    activeAbortController: null,
-    referenceText: "",
-    sessionId: 0,
+    ],
     q10: [
         {
             turn: 0,
@@ -1486,6 +1461,31 @@ Wilzbach法は、水素原子をその放射性同位体である『トリチウ
     ]
 };
 
+// デフォルトのシステムプロンプト
+const defaultSystemPrompt = `あなたは診療放射線技師国家試験対策の専門チューター「SocraticChem」です。
+担当分野は「放射化学」です。
+指導スタイルは「ソクラテス式問答」です。以下のルールを厳格に守って回答してください：
+1. 学生に直接の「答え」や「式そのもの」を絶対にすぐに教えてはいけません。
+2. 常に、1つの応答で提示するヒントは「1ステップ」または「1つの質問」にとどめてください。
+3. 学生が誤った回答をした場合は、どこが間違っているかを考えさせる誘導の質問をしてください。
+4. 正しい理解に達したときは、その内容をわかりやすく褒め、重要ポイントを簡潔にまとめて記憶に定着させてください。
+5. 日本語で、親しみやすく、かつ熱意をもって指導してください。`;
+
+// 状態管理
+const state = {
+    apiKey: "",
+    model: "gemini-2.5-flash",
+    personality: "socratic_standard",
+    systemPrompt: defaultSystemPrompt,
+    chatHistory: [],
+    currentMockQuestionId: null,
+    mockTurnIndex: 0,
+    mockTimeoutId: null,
+    activeAbortController: null,
+    referenceText: "",
+    sessionId: 0,
+};
+
 // UIの初期化
 document.addEventListener("DOMContentLoaded", () => {
     loadSettings();
@@ -1773,18 +1773,25 @@ function loadQuestionTemplate(qid) {
         showTyping(true);
         const currentSessionId = state.sessionId;
         state.mockTimeoutId = setTimeout(() => {
-            if (state.sessionId !== currentSessionId) return;
-            
-            showTyping(false);
-            state.mockTimeoutId = null;
-            const mockResp = mockConversations[qid] ? mockConversations[qid][0].reply : "デモ用のテキストがありません。";
-            appendMessage("model", mockResp);
-            state.chatHistory.push({ role: "user", parts: [{ text: template.initialPrompt }] });
-            state.chatHistory.push({ role: "model", parts: [{ text: mockResp }] });
-            
-            if (chatInput) {
-                chatInput.disabled = false;
-                chatInput.focus();
+            try {
+                if (state.sessionId !== currentSessionId) return;
+                
+                showTyping(false);
+                state.mockTimeoutId = null;
+                const mockResp = (mockConversations[qid] && mockConversations[qid][0]) ? mockConversations[qid][0].reply : "デモ用のテキストがありません。";
+                appendMessage("model", mockResp);
+                state.chatHistory.push({ role: "user", parts: [{ text: template.initialPrompt }] });
+                state.chatHistory.push({ role: "model", parts: [{ text: mockResp }] });
+            } catch (mockErr) {
+                console.error("Mock load error in mobile.js:", mockErr);
+                showTyping(false);
+                state.mockTimeoutId = null;
+                appendSystemMessage("❌ デモデータの読み込み中にエラーが発生しました。");
+            } finally {
+                if (state.sessionId === currentSessionId && chatInput) {
+                    chatInput.disabled = false;
+                    chatInput.focus();
+                }
             }
         }, 1000);
     }
