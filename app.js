@@ -1906,6 +1906,7 @@ function clearChat() {
         chatInput.value = "";
         chatInput.style.height = "auto";
         chatInput.disabled = false; // 過去問切り替え時に確実に入力欄のロックを解除する
+        chatInput.dispatchEvent(new Event('input'));
     }
     const btnSend = document.getElementById("btn-send");
     if (btnSend) {
@@ -1963,7 +1964,7 @@ function appendMessage(role, text) {
 
     setTimeout(() => {
         container.scrollTop = container.scrollHeight;
-    }, 50);
+    }, 150);
 }
 
 // システムテキスト通知
@@ -2236,7 +2237,10 @@ async function fetchAIResponse() {
         state.activeAbortController = null;
         
         if (error.name === "AbortError") {
-            console.log("Fetch aborted (silent).");
+            console.log("Fetch aborted.");
+            if (state.sessionId === currentSessionId) {
+                appendSystemMessage("❌ 接続タイムアウト: 制限時間内（15秒）にAPIからの応答がありませんでした。インターネット回線を確認いただくか、もう一度送信してください。");
+            }
             return "aborted";
         }
         
