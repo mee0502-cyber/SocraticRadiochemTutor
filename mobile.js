@@ -1235,6 +1235,7 @@ function clearChat() {
     if (chatInput) {
         chatInput.value = "";
         chatInput.style.height = "auto";
+        chatInput.disabled = false; // 過去問切り替え時に確実に入力欄のロックを解除する
     }
     const btnSend = document.getElementById("btn-send");
     if (btnSend) {
