@@ -1988,16 +1988,20 @@ async function handleSendMessage() {
         // APIキーがある場合の実処理
         if (state.apiKey) {
             state.chatHistory.push({ role: "user", parts: [{ text: text }] });
-            const success = await fetchAIResponse();
+            const result = await fetchAIResponse();
             
-            // 送信完了後のUI復帰処理
+            if (result === "aborted") {
+                // アボート時はすでにチャットクリアや別問題への遷移が行われているため、後続のUI処理をスキップ
+                return;
+            }
+            
             chatInput.disabled = false;
-            if (success) {
+            if (result === true) {
                 chatInput.value = "";
                 chatInput.style.height = "auto";
                 btnSend.disabled = true;
             } else {
-                // エラー時は入力したテキストを残し、再送可能にする
+                // アボート以外の通常のエラー時は入力テキストを残す
                 chatInput.value = text;
                 btnSend.disabled = false;
             }
@@ -2171,11 +2175,9 @@ async function fetchAIResponse() {
         state.activeAbortController = null;
         
         if (error.name === "AbortError") {
-            appendSystemMessage("❌ エラー: 通信タイムアウト、または接続が切断されました。再試行してください。");
-            if (state.chatHistory.length > 0 && state.chatHistory[state.chatHistory.length - 1].role === "user") {
-                state.chatHistory.pop();
-            }
-            return false;
+            console.log("Fetch aborted (silent).");
+            // 別問題の切り替えやクリア時のアボートは、新セッションの邪魔をしないようサイレントに終了
+            return "aborted";
         }
         
         console.error("Gemini API Error:", error);
