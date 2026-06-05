@@ -1,4 +1,4 @@
-const CACHE_NAME = 'socratic-chem-v3';
+const CACHE_NAME = 'socratic-chem-v8';
 const ASSETS = [
   'index.html',
   'style.css',
@@ -18,6 +18,7 @@ self.addEventListener('install', (e) => {
       return cache.addAll(ASSETS);
     })
   );
+  self.skipWaiting(); // 新しいService Workerを強制的に即時アクティブ化
 });
 
 // アクティベート時に古いキャッシュをクリーンアップ
@@ -31,6 +32,8 @@ self.addEventListener('activate', (e) => {
           }
         })
       );
+    }).then(() => {
+      return self.clients.claim(); // アクティブ化後、即座にページを制御下に置く
     })
   );
 });

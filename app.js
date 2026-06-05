@@ -755,7 +755,8 @@ let state = {
     currentMockQuestionId: null,
     mockTurnIndex: 0,
     mockTimeoutId: null,
-    activeAbortController: null
+    activeAbortController: null,
+    referenceText: ""
 };
 
 // モックモード（APIキーなし）時の会話スクリプト
@@ -845,6 +846,26 @@ const mockConversations = {
 グラフをイメージしてみましょう。娘の放射能がどんどん増えていき、ピーク（極大）に達した瞬間、親の放射能減少ラインと「交差」します。
 交差するということは、その瞬間において両者の放射能は**「等しくなる」**ということです。
 この関係性を覚えておきましょう！`
+        }
+    ],
+    q3: [
+        {
+            turn: 0,
+            reply: `壊変定数と半減期の関係についての問題ですね。
+壊変定数 $\lambda$ と物理学的半減期 $T_{1/2}$ には、公式としてどのような関係式がありますか？`
+        },
+        {
+            check: (text) => text.includes("0.693") || text.includes("ln") || text.includes("log"),
+            success: `その通り！ $T_{1/2} = \frac{\ln(2)}{\lambda} \approx \frac{0.693}{\lambda}$ です。
+今回の壊変定数 $\lambda$ は 0.1 日⁻¹ です。
+この公式に代入して計算すると、半減期 $T$ は何日になりますか？`,
+            fail: `公式を思い出しましょう。半減期 $T$ と壊変定数 $\lambda$ の間には、 $T \approx \frac{0.693}{\lambda}$ という関係があります。この式を元に考えてみてください。`
+        },
+        {
+            check: (text) => text.includes("6.9") || text.includes("7"),
+            success: `正解です！ $\frac{0.693}{0.1} = 6.93 \approx 7$ 日 となります。
+この変換計算も非常に基礎的ながら頻出なので、素早く立式できるようにしておきましょう！`,
+            fail: `$\frac{0.693}{0.1}$ を計算してみてください。小数の位置がずれます。いくつになりますか？`
         }
     ],
     q7: [
@@ -1477,7 +1498,7 @@ $^{68}Ge - ^{68}Ga$ ジェネレータは、病院内にサイクロトロンが
 ジェネレータの組み合わせとして：
 * **$^{99}Mo - ^{99m}Tc** (過渡平衡)
 * **$^{68}Ge - ^{68}Ga** (永続平衡)
-* **$^{81}Rb - ^{81m}Kr** (過渡平衡)
+* **$^{81}Rb - ^{81m}Kr** (永続平衡)
 * **$^{90}Sr - ^{90}Y** (永続平衡)
 などは国試で非常によく問われます。ペアで覚えておきましょう！`,
             fail: `正解は2番の $^{68}Ge$ です。$^{68}Ge - $^{68}Ga$ ジェネレータとして利用されます。
@@ -1537,6 +1558,7 @@ document.addEventListener("DOMContentLoaded", () => {
     loadSettings();
     initUI();
     renderIsotopes();
+    loadReferenceBook();
 });
 
 // UIの初期化とイベント設定
@@ -1747,16 +1769,43 @@ function loadSettings() {
 // ステータス表示の更新
 function updateStatusIndicator() {
     const indicator = document.getElementById("api-status");
+    let refStatusText = "";
+    if (state.referenceText) {
+        refStatusText = ` | 📖参考書: 読み込み済み (${Math.round(state.referenceText.length / 1000)}k文字)`;
+    } else {
+        refStatusText = " | 📖参考書: 未読み込み";
+    }
+
     if (state.apiKey) {
         indicator.innerHTML = `
             <span class="status-dot active"></span>
-            <span class="status-text">接続中: ${state.model}</span>
+            <span class="status-text">接続中: ${state.model}${refStatusText}</span>
         `;
     } else {
         indicator.innerHTML = `
             <span class="status-dot warning"></span>
-            <span class="status-text">デモ（モック）モード動作中</span>
+            <span class="status-text">デモ（モック）モード動作中${refStatusText}</span>
         `;
+    }
+}
+
+// 参考書データの非同期読み込み
+async function loadReferenceBook() {
+    try {
+        console.log("参考書データの自動読み込みを開始します...");
+        const response = await fetch('./reference_book.txt');
+        if (response.ok) {
+            state.referenceText = await response.text();
+            console.log("参考書データを読み込みました。サイズ:", state.referenceText.length, "文字");
+            updateStatusIndicator();
+            appendSystemMessage("📖 放射化学の参考書データを読み込みました。AIはこのデータに基づいて回答します。");
+        } else {
+            console.log("参考書データ (reference_book.txt) が見つかりません。通常のAI回答を使用します。");
+            updateStatusIndicator();
+        }
+    } catch (e) {
+        console.error("参考書データの読み込みエラー:", e);
+        updateStatusIndicator();
     }
 }
 
@@ -1861,6 +1910,20 @@ function appendMessage(role, text) {
     `;
     
     container.appendChild(msgDiv);
+    
+    // KaTeX による数式レンダリングの適用
+    if (typeof renderMathInElement !== 'undefined') {
+        renderMathInElement(msgDiv, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false},
+                {left: '\\(', right: '\\)', display: false},
+                {left: '\\[', right: '\\]', display: true}
+            ],
+            throwOnError: false
+        });
+    }
+
     setTimeout(() => {
         container.scrollTop = container.scrollHeight;
     }, 50);
@@ -2049,7 +2112,10 @@ async function fetchAIResponse() {
         styleInstruction = "\n【追加指示】学生が途中式や考え方を1行書くごとに、その行が数学的・化学的に合っているかを厳密に確認し、合っていれば次のステップの式を書くよう指示してください。";
     }
     
-    const combinedSystemPrompt = state.systemPrompt + styleInstruction;
+    let combinedSystemPrompt = state.systemPrompt + styleInstruction;
+    if (state.referenceText) {
+        combinedSystemPrompt += "\n\n【参考資料（この参考書データを基にして、直接答えを教えずに正しい理解へとソクラテス式に誘導してください）】\n" + state.referenceText;
+    }
 
     const requestBody = {
         contents: state.chatHistory,

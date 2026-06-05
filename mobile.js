@@ -954,7 +954,8 @@ const state = {
     currentMockQuestionId: null,
     mockTurnIndex: 0,
     mockTimeoutId: null,
-    activeAbortController: null
+    activeAbortController: null,
+    referenceText: ""
 };
 
 // UIの初期化
@@ -963,6 +964,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initUI();
     renderTemplates();
     renderIsotopes();
+    loadReferenceBook();
 });
 
 // UIイベントのバインド
@@ -1165,16 +1167,43 @@ function loadSettings() {
 // ステータス表示の更新
 function updateStatusIndicator() {
     const indicator = document.getElementById("api-status");
+    let refStatusText = "";
+    if (state.referenceText) {
+        refStatusText = ` (📖参考書読み込み済: ${Math.round(state.referenceText.length / 1000)}k字)`;
+    } else {
+        refStatusText = " (📖参考書:未読込)";
+    }
+
     if (state.apiKey) {
         indicator.innerHTML = `
             <span class="status-dot active"></span>
-            <span class="status-text">接続中</span>
+            <span class="status-text">接続中${refStatusText}</span>
         `;
     } else {
         indicator.innerHTML = `
             <span class="status-dot warning"></span>
-            <span class="status-text">デモ</span>
+            <span class="status-text">デモ${refStatusText}</span>
         `;
+    }
+}
+
+// 参考書データの非同期読み込み
+async function loadReferenceBook() {
+    try {
+        console.log("参考書データの自動読み込みを開始します...");
+        const response = await fetch('./reference_book.txt');
+        if (response.ok) {
+            state.referenceText = await response.text();
+            console.log("参考書データを読み込みました。サイズ:", state.referenceText.length, "文字");
+            updateStatusIndicator();
+            appendSystemMessage("📖 放射化学の参考書データを読み込みました。AIはこのデータに基づいて回答します。");
+        } else {
+            console.log("参考書データ (reference_book.txt) が見つかりません。");
+            updateStatusIndicator();
+        }
+    } catch (e) {
+        console.error("参考書データの読み込みエラー:", e);
+        updateStatusIndicator();
     }
 }
 
@@ -1274,6 +1303,20 @@ function appendMessage(role, text) {
     `;
     
     container.appendChild(msgDiv);
+    
+    // KaTeX による数式レンダリングの適用
+    if (typeof renderMathInElement !== 'undefined') {
+        renderMathInElement(msgDiv, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false},
+                {left: '\\(', right: '\\)', display: false},
+                {left: '\\[', right: '\\]', display: true}
+            ],
+            throwOnError: false
+        });
+    }
+
     setTimeout(() => {
         container.scrollTop = container.scrollHeight;
     }, 50);
@@ -1450,7 +1493,10 @@ async function fetchAIResponse() {
         styleInstruction = "\n【追加指示】学生が途中式や考え方を1行書くごとに、その行が数学的・化学的に合っているかを厳密に確認し、合っていれば次のステップの式を書くよう指示してください。";
     }
     
-    const combinedSystemPrompt = state.systemPrompt + styleInstruction;
+    let combinedSystemPrompt = state.systemPrompt + styleInstruction;
+    if (state.referenceText) {
+        combinedSystemPrompt += "\n\n【参考資料（この参考書データを基にして、直接答えを教えずに正しい理解へとソクラテス式に誘導してください）】\n" + state.referenceText;
+    }
 
     const requestBody = {
         contents: state.chatHistory,
