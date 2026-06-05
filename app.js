@@ -1913,86 +1913,103 @@ async function handleSendMessage() {
     const text = chatInput.value.trim();
     if (!text) return;
 
-    // 送信中は入力欄とボタンを無効化
-    chatInput.disabled = true;
-    btnSend.disabled = true;
+    try {
+        // 送信中は入力欄とボタンを無効化
+        chatInput.disabled = true;
+        btnSend.disabled = true;
 
-    // 画面にユーザーメッセージ追加
-    appendMessage("user", text);
+        // 画面にユーザーメッセージ追加
+        appendMessage("user", text);
 
-    // APIキーがある場合の実処理
-    if (state.apiKey) {
-        state.chatHistory.push({ role: "user", parts: [{ text: text }] });
-        const success = await fetchAIResponse();
-        
-        // 送信完了後のUI復帰処理
-        chatInput.disabled = false;
-        if (success) {
-            chatInput.value = "";
-            chatInput.style.height = "auto";
-            btnSend.disabled = true;
-        } else {
-            // エラー時は入力したテキストを残し、再送可能にする
-            chatInput.value = text;
-            btnSend.disabled = false;
-        }
-        chatInput.focus();
-    } else {
-        // デモモードでの挙動
-        if (state.mockTimeoutId) {
-            clearTimeout(state.mockTimeoutId);
-        }
-        showTyping(true);
-        state.mockTimeoutId = setTimeout(() => {
-            showTyping(false);
-            state.mockTimeoutId = null;
+        // APIキーがある場合の実処理
+        if (state.apiKey) {
+            state.chatHistory.push({ role: "user", parts: [{ text: text }] });
+            const success = await fetchAIResponse();
             
-            let success = false;
-            // 過去問の進行度があれば対話スクリプトをたどる
-            if (state.currentMockQuestionId && mockConversations[state.currentMockQuestionId]) {
-                const script = mockConversations[state.currentMockQuestionId];
-                state.mockTurnIndex++;
-                
-                const currentStep = script[state.mockTurnIndex];
-                if (currentStep) {
-                    // ユーザーの回答チェック
-                    if (currentStep.check(text)) {
-                        appendMessage("model", currentStep.success);
-                        state.chatHistory.push({ role: "user", parts: [{ text: text }] });
-                        state.chatHistory.push({ role: "model", parts: [{ text: currentStep.success }] });
-                        success = true;
-                    } else {
-                        // 間違えた場合はターンを戻す（もう一度答えさせる）
-                        state.mockTurnIndex--;
-                        appendMessage("model", currentStep.fail);
-                        state.chatHistory.push({ role: "user", parts: [{ text: text }] });
-                        state.chatHistory.push({ role: "model", parts: [{ text: currentStep.fail }] });
-                        success = true;
-                    }
-                } else {
-                    // 全ターン終了時
-                    const endMsg = "よく理解できましたね！この問題の演習は終了です。他のテンプレートを選択するか、APIキーを入力してフリートークをお試しください。";
-                    appendMessage("model", endMsg);
-                    success = true;
-                }
-            } else {
-                // 通常のフリートークに対するデモエラー
-                const fallback = "【デモモード】\nご質問ありがとうございます。現在APIキーが設定されていないため、自由な質問へのAI応答ができません。\n\n左側の「国試過去問演習」から選択していただくか、右上の「設定」からGemini APIキーを入力いただくと、私と自由にチャット勉強が可能です！";
-                appendMessage("model", fallback);
-                success = true;
-            }
-
+            // 送信完了後のUI復帰処理
             chatInput.disabled = false;
             if (success) {
                 chatInput.value = "";
                 chatInput.style.height = "auto";
                 btnSend.disabled = true;
             } else {
+                // エラー時は入力したテキストを残し、再送可能にする
                 chatInput.value = text;
                 btnSend.disabled = false;
             }
             chatInput.focus();
-        }, 1200);
+        } else {
+            // デモモードでの挙動
+            if (state.mockTimeoutId) {
+                clearTimeout(state.mockTimeoutId);
+            }
+            showTyping(true);
+            state.mockTimeoutId = setTimeout(() => {
+                try {
+                    showTyping(false);
+                    state.mockTimeoutId = null;
+                    
+                    let success = false;
+                    // 過去問の進行度があれば対話スクリプトをたどる
+                    if (state.currentMockQuestionId && mockConversations[state.currentMockQuestionId]) {
+                        const script = mockConversations[state.currentMockQuestionId];
+                        state.mockTurnIndex++;
+                        
+                        const currentStep = script[state.mockTurnIndex];
+                        if (currentStep) {
+                            // ユーザーの回答チェック
+                            if (currentStep.check(text)) {
+                                appendMessage("model", currentStep.success);
+                                state.chatHistory.push({ role: "user", parts: [{ text: text }] });
+                                state.chatHistory.push({ role: "model", parts: [{ text: currentStep.success }] });
+                                success = true;
+                            } else {
+                                // 間違えた場合はターンを戻す（もう一度答えさせる）
+                                state.mockTurnIndex--;
+                                appendMessage("model", currentStep.fail);
+                                state.chatHistory.push({ role: "user", parts: [{ text: text }] });
+                                state.chatHistory.push({ role: "model", parts: [{ text: currentStep.fail }] });
+                                success = true;
+                            }
+                        } else {
+                            // 全ターン終了時
+                            const endMsg = "よく理解できましたね！この問題の演習は終了です。他のテンプレートを選択するか、APIキーを入力してフリートークをお試しください。";
+                            appendMessage("model", endMsg);
+                            success = true;
+                        }
+                    } else {
+                        // 通常のフリートークに対するデモエラー
+                        const fallback = "【デモモード】\nご質問ありがとうございます。現在APIキーが設定されていないため、自由な質問へのAI応答ができません。\n\n左側の「国試過去問演習」から選択していただくか、右上の「設定」からGemini APIキーを入力いただくと、私と自由にチャット勉強が可能です！";
+                        appendMessage("model", fallback);
+                        success = true;
+                    }
+
+                    chatInput.disabled = false;
+                    if (success) {
+                        chatInput.value = "";
+                        chatInput.style.height = "auto";
+                        btnSend.disabled = true;
+                    } else {
+                        chatInput.value = text;
+                        btnSend.disabled = false;
+                    }
+                    chatInput.focus();
+                } catch (mockErr) {
+                    console.error("Mock mode error in app.js:", mockErr);
+                    chatInput.disabled = false;
+                    chatInput.value = text;
+                    btnSend.disabled = false;
+                    showTyping(false);
+                }
+            }, 1200);
+        }
+    } catch (e) {
+        console.error("handleSendMessage critical error in app.js:", e);
+        chatInput.disabled = false;
+        chatInput.value = text;
+        btnSend.disabled = false;
+        showTyping(false);
+        appendSystemMessage(`❌ 送信処理中にエラーが発生しました: ${e.message}`);
     }
 }
 
@@ -2002,12 +2019,21 @@ async function fetchAIResponse() {
     
     // 既存のリクエストがあればキャンセルする
     let signal = null;
+    let timeoutId = null;
+    
     if (typeof AbortController !== 'undefined') {
         if (state.activeAbortController) {
             state.activeAbortController.abort();
         }
         state.activeAbortController = new AbortController();
         signal = state.activeAbortController.signal;
+
+        // 15秒のタイムアウトを設定
+        timeoutId = setTimeout(() => {
+            if (state.activeAbortController) {
+                state.activeAbortController.abort();
+            }
+        }, 15000);
     }
     
     // システム命令プロンプトを先頭または設定に注入
@@ -2049,6 +2075,8 @@ async function fetchAIResponse() {
         }
 
         const response = await fetch(url, fetchOptions);
+        
+        if (timeoutId) clearTimeout(timeoutId);
 
         if (!response.ok) {
             const errData = await response.json();
@@ -2070,12 +2098,19 @@ async function fetchAIResponse() {
         }
 
     } catch (error) {
-        if (error.name === "AbortError") {
-            // キャンセルによるアボートの場合は何もしない
-            return false;
-        }
+        if (timeoutId) clearTimeout(timeoutId);
+        
         showTyping(false);
         state.activeAbortController = null;
+        
+        if (error.name === "AbortError") {
+            appendSystemMessage("❌ エラー: 通信タイムアウト、または接続が切断されました。再試行してください。");
+            if (state.chatHistory.length > 0 && state.chatHistory[state.chatHistory.length - 1].role === "user") {
+                state.chatHistory.pop();
+            }
+            return false;
+        }
+        
         console.error("Gemini API Error:", error);
         
         // エラー発生時は、同じ role (user) が連続してAPIエラー(400)になるのを防ぐため、直前に追加したuser発言を履歴から削除
