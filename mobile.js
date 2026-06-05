@@ -1319,20 +1319,35 @@ function showTyping(show) {
 }
 
 // メッセージ送信時の処理
+// メッセージ送信時の処理
 async function handleSendMessage() {
     const chatInput = document.getElementById("chat-input");
+    const btnSend = document.getElementById("btn-send");
     const text = chatInput.value.trim();
     if (!text) return;
 
-    chatInput.value = "";
-    chatInput.style.height = "auto";
-    document.getElementById("btn-send").disabled = true;
+    // 送信中は入力欄とボタンを無効化
+    chatInput.disabled = true;
+    btnSend.disabled = true;
 
     appendMessage("user", text);
 
     if (state.apiKey) {
         state.chatHistory.push({ role: "user", parts: [{ text: text }] });
-        await fetchAIResponse();
+        const success = await fetchAIResponse();
+        
+        // 送信完了後のUI復帰処理
+        chatInput.disabled = false;
+        if (success) {
+            chatInput.value = "";
+            chatInput.style.height = "auto";
+            btnSend.disabled = true;
+        } else {
+            // エラー時は入力したテキストを残し、再送可能にする
+            chatInput.value = text;
+            btnSend.disabled = false;
+        }
+        chatInput.focus();
     } else {
         if (state.mockTimeoutId) {
             clearTimeout(state.mockTimeoutId);
@@ -1342,6 +1357,7 @@ async function handleSendMessage() {
             showTyping(false);
             state.mockTimeoutId = null;
             
+            let success = false;
             if (state.currentMockQuestionId && mockConversations[state.currentMockQuestionId]) {
                 const script = mockConversations[state.currentMockQuestionId];
                 state.mockTurnIndex++;
@@ -1352,20 +1368,35 @@ async function handleSendMessage() {
                         appendMessage("model", currentStep.success);
                         state.chatHistory.push({ role: "user", parts: [{ text: text }] });
                         state.chatHistory.push({ role: "model", parts: [{ text: currentStep.success }] });
+                        success = true;
                     } else {
                         state.mockTurnIndex--;
                         appendMessage("model", currentStep.fail);
                         state.chatHistory.push({ role: "user", parts: [{ text: text }] });
                         state.chatHistory.push({ role: "model", parts: [{ text: currentStep.fail }] });
+                        success = true;
                     }
                 } else {
                     const endMsg = "よく理解できましたね！この問題の演習は終了です。「過去問」タブから他のテーマを選択するか、APIキーを入力してフリートークをお試しください。";
                     appendMessage("model", endMsg);
+                    success = true;
                 }
             } else {
                 const fallback = "【デモモード】\n現在APIキーが設定されていないため、自由な質問へのAI応答ができません。\n\n「過去問」タブから問題を選んでいただくか、「設定」タブからGemini APIキーを入力いただくと、私と自由にチャット勉強が可能です！";
                 appendMessage("model", fallback);
+                success = true;
             }
+
+            chatInput.disabled = false;
+            if (success) {
+                chatInput.value = "";
+                chatInput.style.height = "auto";
+                btnSend.disabled = true;
+            } else {
+                chatInput.value = text;
+                btnSend.disabled = false;
+            }
+            chatInput.focus();
         }, 1200);
     }
 }
@@ -1434,13 +1465,14 @@ async function fetchAIResponse() {
         if (aiReply) {
             appendMessage("model", aiReply);
             state.chatHistory.push({ role: "model", parts: [{ text: aiReply }] });
+            return true; // 成功
         } else {
             throw new Error("AIからの応答が空でした。");
         }
 
     } catch (error) {
         if (error.name === "AbortError") {
-            return;
+            return false;
         }
         showTyping(false);
         state.activeAbortController = null;
@@ -1452,6 +1484,7 @@ async function fetchAIResponse() {
         }
         
         appendSystemMessage(`❌ エラー: ${error.message}\nAPIキーと接続環境を確認してください。`);
+        return false; // 失敗
     }
 }
 
