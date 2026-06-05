@@ -161,6 +161,7 @@ body {
     bottom: 0;
     flex-direction: column;
     justify-content: space-between;
+    overflow: hidden;
 }
 
 #view-chat.active {

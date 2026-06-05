@@ -1860,7 +1860,9 @@ function appendMessage(role, text) {
     `;
     
     container.appendChild(msgDiv);
-    container.scrollTop = container.scrollHeight;
+    setTimeout(() => {
+        container.scrollTop = container.scrollHeight;
+    }, 50);
 }
 
 // システムテキスト通知
@@ -1873,7 +1875,9 @@ function appendSystemMessage(text) {
         <div class="msg-content" style="font-size: 0.85rem; color: var(--primary);">${escapeHTML(text)}</div>
     `;
     container.appendChild(msgDiv);
-    container.scrollTop = container.scrollHeight;
+    setTimeout(() => {
+        container.scrollTop = container.scrollHeight;
+    }, 50);
 }
 
 // エスケープ処理
@@ -1894,7 +1898,9 @@ function showTyping(show) {
         // インジケータを一番下に移動してから表示
         container.appendChild(indicator);
         indicator.style.display = "flex";
-        container.scrollTop = container.scrollHeight;
+        setTimeout(() => {
+            container.scrollTop = container.scrollHeight;
+        }, 50);
     } else {
         indicator.style.display = "none";
     }
