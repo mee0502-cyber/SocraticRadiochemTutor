@@ -1639,6 +1639,13 @@ function startApp() {
     renderTemplates();
     renderIsotopes();
     loadReferenceBook();
+    
+    // 自動クリーンリロード方式: 予約された過去問があればロード
+    const pendingQid = sessionStorage.getItem("pending_qid");
+    if (pendingQid) {
+        sessionStorage.removeItem("pending_qid");
+        loadQuestionTemplateDirectly(pendingQid);
+    }
 }
 
 if (document.readyState === "loading") {
@@ -1888,11 +1895,17 @@ async function loadReferenceBook() {
 }
 
 // 過去問テンプレートのロード
+// 過去問テンプレートのロード（クリーンリロード予約）
 function loadQuestionTemplate(qid) {
+    sessionStorage.setItem("pending_qid", qid);
+    window.location.reload();
+}
+
+function loadQuestionTemplateDirectly(qid) {
     const template = questionTemplates[qid];
     if (!template) return;
     
-    clearChat();
+    clearChatDOM();
     
     // ユーザーの質問表示用
     appendMessage("user", template.text);
@@ -1950,7 +1963,13 @@ function loadQuestionTemplate(qid) {
 }
 
 // チャットをクリア
+// チャット履歴のクリアとクリーンリロード
 function clearChat() {
+    sessionStorage.removeItem("pending_qid");
+    window.location.reload();
+}
+
+function clearChatDOM() {
     state.sessionId++; // セッションIDをインクリメント（古い非同期処理をすべて無効化）
     
     const messagesContainer = document.getElementById("chat-messages");
