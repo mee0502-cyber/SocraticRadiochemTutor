@@ -756,7 +756,8 @@ let state = {
     mockTurnIndex: 0,
     mockTimeoutId: null,
     activeAbortController: null,
-    referenceText: ""
+    referenceText: "",
+    sessionId: 0
 };
 
 // モックモード（APIキーなし）時の会話スクリプト
@@ -1821,23 +1822,44 @@ function loadQuestionTemplate(qid) {
         // ユーザーの質問表示用
         appendMessage("user", template.text);
         
+        // 開始時はAIの最初の応答を待つため、入力欄と送信ボタンをロック
+        const chatInput = document.getElementById("chat-input");
+        const btnSend = document.getElementById("btn-send");
+        if (chatInput) chatInput.disabled = true;
+        if (btnSend) btnSend.disabled = true;
+        
         // API動作かデモ動作かに応じて応答を呼び出す
         if (state.apiKey) {
             state.chatHistory.push({ role: "user", parts: [{ text: template.initialPrompt }] });
-            fetchAIResponse();
+            const currentSessionId = state.sessionId;
+            fetchAIResponse().then(() => {
+                if (state.sessionId !== currentSessionId) return;
+                if (chatInput) {
+                    chatInput.disabled = false;
+                    chatInput.focus();
+                }
+            });
         } else {
             // モックモード初期化
             state.currentMockQuestionId = qid;
             state.mockTurnIndex = 0;
             
             showTyping(true);
+            const currentSessionId = state.sessionId;
             state.mockTimeoutId = setTimeout(() => {
+                if (state.sessionId !== currentSessionId) return;
+                
                 showTyping(false);
                 state.mockTimeoutId = null;
                 const mockResp = mockConversations[qid] ? mockConversations[qid][0].reply : "デモ用のテキストがありません。";
                 appendMessage("model", mockResp);
                 state.chatHistory.push({ role: "user", parts: [{ text: template.initialPrompt }] });
                 state.chatHistory.push({ role: "model", parts: [{ text: mockResp }] });
+                
+                if (chatInput) {
+                    chatInput.disabled = false;
+                    chatInput.focus();
+                }
             }, 1000);
         }
     }
@@ -1845,6 +1867,8 @@ function loadQuestionTemplate(qid) {
 
 // チャットをクリア
 function clearChat() {
+    state.sessionId++; // セッションIDをインクリメント（古い非同期処理をすべて無効化）
+    
     const messagesContainer = document.getElementById("chat-messages");
     messagesContainer.innerHTML = "";
     state.chatHistory = [];
@@ -1988,7 +2012,13 @@ async function handleSendMessage() {
         // APIキーがある場合の実処理
         if (state.apiKey) {
             state.chatHistory.push({ role: "user", parts: [{ text: text }] });
+            const currentSessionId = state.sessionId;
             const result = await fetchAIResponse();
+            
+            if (state.sessionId !== currentSessionId) {
+                // セッションが既に切り替わっている場合は、後続のUI処理をスキップ
+                return;
+            }
             
             if (result === "aborted") {
                 // アボート時はすでにチャットクリアや別問題への遷移が行われているため、後続のUI処理をスキップ
@@ -2012,8 +2042,11 @@ async function handleSendMessage() {
                 clearTimeout(state.mockTimeoutId);
             }
             showTyping(true);
+            const currentSessionId = state.sessionId;
             state.mockTimeoutId = setTimeout(() => {
                 try {
+                    if (state.sessionId !== currentSessionId) return;
+                    
                     showTyping(false);
                     state.mockTimeoutId = null;
                     
@@ -2085,6 +2118,8 @@ async function handleSendMessage() {
 async function fetchAIResponse() {
     showTyping(true);
     
+    const currentSessionId = state.sessionId;
+    
     // 既存のリクエストがあればキャンセルする
     let signal = null;
     let timeoutId = null;
@@ -2149,6 +2184,10 @@ async function fetchAIResponse() {
         
         if (timeoutId) clearTimeout(timeoutId);
 
+        if (state.sessionId !== currentSessionId) {
+            return "aborted";
+        }
+
         if (!response.ok) {
             const errData = await response.json();
             throw new Error(errData.error?.message || "通信エラーが発生しました");
@@ -2157,6 +2196,10 @@ async function fetchAIResponse() {
         const data = await response.json();
         const aiReply = data.candidates?.[0]?.content?.parts?.[0]?.text;
         
+        if (state.sessionId !== currentSessionId) {
+            return "aborted";
+        }
+
         showTyping(false);
         state.activeAbortController = null;
         
@@ -2171,12 +2214,16 @@ async function fetchAIResponse() {
     } catch (error) {
         if (timeoutId) clearTimeout(timeoutId);
         
+        if (state.sessionId !== currentSessionId) {
+            console.log("Fetch aborted (silent via sessionId).");
+            return "aborted";
+        }
+
         showTyping(false);
         state.activeAbortController = null;
         
         if (error.name === "AbortError") {
             console.log("Fetch aborted (silent).");
-            // 別問題の切り替えやクリア時のアボートは、新セッションの邪魔をしないようサイレントに終了
             return "aborted";
         }
         
