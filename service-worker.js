@@ -1,4 +1,4 @@
-const CACHE_NAME = 'socratic-chem-v8';
+const CACHE_NAME = 'socratic-chem-v9';
 const ASSETS = [
   'index.html',
   'style.css',
