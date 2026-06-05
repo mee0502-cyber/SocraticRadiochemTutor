@@ -1555,12 +1555,18 @@ Wilzbach法は、水素原子をその放射性同位体である『トリチウ
 };
 
 // 起動時の初期化
-document.addEventListener("DOMContentLoaded", () => {
+function startApp() {
     loadSettings();
     initUI();
     renderIsotopes();
     loadReferenceBook();
-});
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", startApp);
+} else {
+    startApp();
+}
 
 // UIの初期化とイベント設定
 function initUI() {

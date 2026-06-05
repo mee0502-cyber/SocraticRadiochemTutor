@@ -1487,13 +1487,19 @@ const state = {
 };
 
 // UIの初期化
-document.addEventListener("DOMContentLoaded", () => {
+function startApp() {
     loadSettings();
     initUI();
     renderTemplates();
     renderIsotopes();
     loadReferenceBook();
-});
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", startApp);
+} else {
+    startApp();
+}
 
 // UIイベントのバインド
 function initUI() {
